@@ -74,7 +74,8 @@ public class StandardTuner implements CassandraTuner
         map.put("saved_caches_directory", config.getCacheLocation());
         map.put("commitlog_directory", config.getCommitLogLocation());
         map.put("data_file_directories", Lists.newArrayList(config.getDataFileLocation()));
-        boolean enableIncremental = (config.getBackupHour() >= 0 && config.isIncrBackup()) && (CollectionUtils.isEmpty(config.getBackupRacs()) || config.getBackupRacs().contains(config.getRac()));
+        // boolean enableIncremental = (config.getBackupHour() >= 0 && config.isIncrBackup()) && (CollectionUtils.isEmpty(config.getBackupRacs()) || config.getBackupRacs().contains(config.getRac()));
+        boolean enableIncremental = config.isIncrBackup();
         map.put("incremental_backups", enableIncremental);
         map.put("endpoint_snitch", config.getSnitch());
         // map.put("in_memory_compaction_limit_in_mb", config.getInMemoryCompactionLimit());
@@ -104,8 +105,8 @@ public class StandardTuner implements CassandraTuner
 
         configureSecurity(map);
         configureGlobalCaches(config, map);
-        //force to 1 until vnodes are properly supported
-	    map.put("num_tokens", 1);
+        // 
+	    map.put("num_tokens", 256);
 	    
 	    
 	    addExtraCassParams(map);
