@@ -31,12 +31,12 @@ public class TestModule extends AbstractModule
     @Override
     protected void configure()
     {
-        bind(IConfiguration.class).toInstance(
-                new FakeConfiguration(FakeConfiguration.FAKE_REGION, "fake-app", "az1", "fakeInstance1"));
+		IConfiguration config = new FakeConfiguration(FakeConfiguration.FAKE_REGION, "fake-app", "az1", "fakeInstance1");
+        bind(IConfiguration.class).toInstance(config);
         bind(IPriamInstanceFactory.class).to(FakePriamInstanceFactory.class);
         bind(SchedulerFactory.class).to(StdSchedulerFactory.class).in(Scopes.SINGLETON);
         bind(IMembership.class).toInstance(new FakeMembership(
-                ImmutableList.of("fakeInstance1", "fakeInstance2", "fakeInstance3")));
+                ImmutableList.of("fakeInstance1", "fakeInstance2", "fakeInstance3"),config));
         bind(ICredential.class).to(FakeCredentials.class).in(Scopes.SINGLETON);
         bind(IBackupFileSystem.class).to(NullBackupFileSystem.class);
         bind(AbstractBackupPath.class).to(S3BackupPath.class);

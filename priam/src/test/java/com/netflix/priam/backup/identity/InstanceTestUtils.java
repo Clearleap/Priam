@@ -47,9 +47,10 @@ public abstract class InstanceTestUtils
         instances.add("fakeinstance7");
         instances.add("fakeinstance8");
         instances.add("fakeinstance9");
+        instances.add("fakeinstance10");
 
-        membership = new FakeMembership(instances);
         config = new FakeConfiguration("fake", "fake-app", "az1", "fakeinstance1");
+        membership = new FakeMembership(instances,config);
         factory = new FakePriamInstanceFactory(config);
         sleeper = new FakeSleeper();
         this.deadTokenRetriever = new DeadTokenRetriever(factory, membership, config, sleeper);
@@ -57,19 +58,17 @@ public abstract class InstanceTestUtils
         this.newTokenRetriever = new NewTokenRetriever(factory, membership, config, sleeper, tokenManager);
     }
 
+	// won't create "loop-sided" clusters, will create an instance in each az until there aren't enough
+	// left in map to put one in all az's.. adjust the instance map above and azs in FakeConf to test your deployment scenario.
     public void createInstances() throws Exception
     {
-        createInstanceIdentity("az1", "fakeinstance1");
-        createInstanceIdentity("az1", "fakeinstance2");
-        createInstanceIdentity("az1", "fakeinstance3");
-        // try next region
-        createInstanceIdentity("az2", "fakeinstance4");
-        createInstanceIdentity("az2", "fakeinstance5");
-        createInstanceIdentity("az2", "fakeinstance6");
-        // next region
-        createInstanceIdentity("az3", "fakeinstance7");
-        createInstanceIdentity("az3", "fakeinstance8");
-        createInstanceIdentity("az3", "fakeinstance9");
+		int pos = 0;
+		for (int x=0;x < membership.getRacMembershipSize()/membership.getRacCount(); x++) {
+			for (String rac : config.getRacs()) {
+				createInstanceIdentity(rac, instances.get(pos));
+				pos++;
+			}
+		}
     }
     
     protected InstanceIdentity createInstanceIdentity(String zone, String instanceId) throws Exception

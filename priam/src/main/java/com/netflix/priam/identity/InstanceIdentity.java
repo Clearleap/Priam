@@ -275,13 +275,13 @@ public class InstanceIdentity
 
     public List<String> getSeeds() throws UnknownHostException
     {
-        logger.trace("getSeeds() - entry");
+        logger.debug("getSeeds() - entry");
         populateRacMap();
         List<String> seeds = new LinkedList<String>();
         // Handle single zone deployment
         if (config.getRacs().size() == 1)
         {
-            logger.trace("I'm a single zone");
+            logger.debug("I'm a single zone");
             // Return empty list if all nodes are not up
             if (membership.getRacMembershipSize() != locMap.get(myInstance.getRac()).size()) {
                 logger.debug("I don't think all my nodes are up yet");
@@ -290,24 +290,24 @@ public class InstanceIdentity
             // If seed node, return the next node in the list
             if (locMap.get(myInstance.getRac()).size() > 1 && locMap.get(myInstance.getRac()).get(0).getHostIP().equals(myInstance.getHostIP()))
             {	
-                logger.trace("I'm a seed node, but in a single zone instance?");
+                logger.debug("I'm a seed node, but in a single zone instance?");
             	PriamInstance instance = locMap.get(myInstance.getRac()).get(1);
                 logger.debug("Location has an instance:" + (instance != null ? instance.toString() : "null"));
             	if (instance != null && !isInstanceDummy(instance))
             	{
             	    if (config.isMultiDC()) {
-                        logger.trace("multidc, config.getDC="+ config.getDC());
-                        logger.trace("multidc, instance.getDC="+ instance.getDC());
+                        logger.debug("multidc, config.getDC="+ config.getDC());
+                        logger.debug("multidc, instance.getDC="+ instance.getDC());
                         if (config.getDC().equals(instance.getDC())) seeds.add(instance.getHostName());
                         else seeds.add(instance.getHostIP());
                     } else
             		   seeds.add(instance.getHostName());
                 } else {
-                    logger.trace("Instance is no good.");
+                    logger.debug("Instance is no good.");
                 }
             }
         }
-        logger.trace("Adding other seeds");
+        logger.debug("Adding other seeds");
         for (String loc : locMap.keySet())
         {
             logger.debug("From location:" + loc);
@@ -316,8 +316,8 @@ public class InstanceIdentity
         		if (instance != null && !isInstanceDummy(instance))
         		{
         			if (config.isMultiDC()) {
-                        logger.trace("multidc, config.getDC=" + config.getDC());
-                        logger.trace("multidc, instance.getDC=" + instance.getDC());
+                        logger.debug("multidc, config.getDC=" + config.getDC());
+                        logger.debug("multidc, instance.getDC=" + instance.getDC());
                         if (config.getDC().equals(instance.getDC())) seeds.add(instance.getHostName());
                         else seeds.add(instance.getHostIP());
                     } else

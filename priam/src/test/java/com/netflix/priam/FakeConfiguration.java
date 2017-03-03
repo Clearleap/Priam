@@ -88,7 +88,9 @@ public class FakeConfiguration implements IConfiguration
     @Override
     public List<String> getRacs()
     {
-        return Arrays.asList("az1", "az2", "az3");
+		// adjust with instance list in InstanceTestUtils for different scenarios
+        return Arrays.asList("az1","az2", "az3","az4","az5");
+        // return Arrays.asList("az1","az2", "az3");
     }
 
     @Override

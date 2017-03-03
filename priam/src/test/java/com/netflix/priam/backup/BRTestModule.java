@@ -52,10 +52,11 @@ public class BRTestModule extends AbstractModule
     @Override
     protected void configure()
     {
-        bind(IConfiguration.class).toInstance(new FakeConfiguration(FakeConfiguration.FAKE_REGION, "fake-app", "az1", "fakeInstance1"));
+		IConfiguration config = new FakeConfiguration(FakeConfiguration.FAKE_REGION, "fake-app", "az1", "fakeInstance1");
+        bind(IConfiguration.class).toInstance(config);
         bind(IPriamInstanceFactory.class).to(FakePriamInstanceFactory.class);
         bind(SchedulerFactory.class).to(StdSchedulerFactory.class).in(Scopes.SINGLETON);
-        bind(IMembership.class).toInstance(new FakeMembership(Arrays.asList("fakeInstance1")));
+        bind(IMembership.class).toInstance(new FakeMembership(Arrays.asList("fakeInstance1"),config));
         bind(ICredential.class).to(FakeNullCredential.class).in(Scopes.SINGLETON);
 //        bind(IBackupFileSystem.class).to(FakeBackupFileSystem.class).in(Scopes.SINGLETON);
         bind(IBackupFileSystem.class).annotatedWith(Names.named("backup")).to(FakeBackupFileSystem.class).in(Scopes.SINGLETON);

@@ -21,34 +21,37 @@ public class InstanceIdentityTest extends InstanceTestUtils
     {
 
         identity = createInstanceIdentity("az1", "fakeinstance1");
+
         int hash = tokenManager.regionOffset(config.getDC());
+		int rac_cnt = membership.getRacCount();
+
         assertEquals(0, identity.getInstance().getId() - hash);
 
         identity = createInstanceIdentity("az1", "fakeinstance2");
-        assertEquals(3, identity.getInstance().getId() - hash);
+        assertEquals(rac_cnt, identity.getInstance().getId() - hash);
 
         identity = createInstanceIdentity("az1", "fakeinstance3");
-        assertEquals(6, identity.getInstance().getId() - hash);
+        assertEquals(2*rac_cnt, identity.getInstance().getId() - hash);
 
         // try next region
         identity = createInstanceIdentity("az2", "fakeinstance4");
         assertEquals(1, identity.getInstance().getId() - hash);
 
         identity = createInstanceIdentity("az2", "fakeinstance5");
-        assertEquals(4, identity.getInstance().getId() - hash);
+        assertEquals(rac_cnt+1, identity.getInstance().getId() - hash);
 
         identity = createInstanceIdentity("az2", "fakeinstance6");
-        assertEquals(7, identity.getInstance().getId() - hash);
+        assertEquals((2*rac_cnt)+1, identity.getInstance().getId() - hash);
 
         // next
         identity = createInstanceIdentity("az3", "fakeinstance7");
         assertEquals(2, identity.getInstance().getId() - hash);
 
         identity = createInstanceIdentity("az3", "fakeinstance8");
-        assertEquals(5, identity.getInstance().getId() - hash);
+        assertEquals(rac_cnt+2, identity.getInstance().getId() - hash);
 
         identity = createInstanceIdentity("az3", "fakeinstance9");
-        assertEquals(8, identity.getInstance().getId() - hash);
+        assertEquals(2*rac_cnt+2, identity.getInstance().getId() - hash);
     }
     
     @Test
@@ -56,22 +59,31 @@ public class InstanceIdentityTest extends InstanceTestUtils
     {
         createInstances();
         identity = createInstanceIdentity("az1", "fakeinstance1");
-        assertEquals(3, identity.getSeeds().size());
+		// assert seed from each az, unless there is only one instance in each az, in which case we expect cnt-1
+		int n = (membership.getRacMembershipSize()/membership.getRacCount() == 1 ? 1 : 0);
+        assertEquals(membership.getRacCount() - n, identity.getSeeds().size());
     }
 
     @Test
     public void testDoubleSlots() throws Exception
     {
         createInstances();
-        int before = factory.getAllIds("fake-app").size();
-        new DoubleRing(config, factory, tokenManager).doubleSlots();
+        int before = factory.getAllIds(config.getAppName()).size();
         List<PriamInstance> lst = factory.getAllIds(config.getAppName());
+        factory.sort(lst);
+        for (int i = 0; i < lst.size(); i++)
+        {
+            System.out.println(i + " " + i % 2 + " " + lst.get(i));
+        }
+        new DoubleRing(config, factory, tokenManager).doubleSlots();
+        lst = factory.getAllIds(config.getAppName());
         // sort it so it will look good if you want to print it.
         factory.sort(lst);
         for (int i = 0; i < lst.size(); i++)
         {
-            System.out.println(lst.get(i));
-            if (0 == i % 2)
+            System.out.println(i + " " + i % 2 + " " + lst.get(i));
+			// every other instance should be a new, empty one
+            if (i % 2 == 0)
                 continue;
             assertEquals(InstanceIdentity.DUMMY_INSTANCE_ID, lst.get(i).getInstanceId());
         }

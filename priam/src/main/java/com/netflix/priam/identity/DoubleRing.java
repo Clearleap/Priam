@@ -60,6 +60,7 @@ public class DoubleRing
     public void doubleSlots()
     {
         List<PriamInstance> local = filteredRemote(factory.getAllIds(config.getAppName()));
+		int rac_cnt = config.getRacs().size();
 
         // delete all
         for (PriamInstance data : local)
@@ -78,7 +79,7 @@ public class DoubleRing
         {
             // if max then rotate.
             int currentSlot = data.getId() - hash;
-            int new_slot = currentSlot + 3 > new_ring_size ? (currentSlot + 3) - new_ring_size : currentSlot + 3;
+            int new_slot = currentSlot + rac_cnt > new_ring_size ? (currentSlot + rac_cnt) - new_ring_size : currentSlot + rac_cnt;
             String token = tokenManager.createToken(new_slot, new_ring_size, config.getDC());
             factory.create(data.getApp(), new_slot + hash, InstanceIdentity.DUMMY_INSTANCE_ID, config.getHostname(), config.getHostIP(), data.getRac(), null, token);
         }

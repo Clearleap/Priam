@@ -9,10 +9,12 @@ public class FakeMembership implements IMembership
 {
 
     private List<String> instances;
+	private IConfiguration config;
 
-    public FakeMembership(List<String> priamInstances)
+    public FakeMembership(List<String> priamInstances, IConfiguration config)
     {
         this.instances = priamInstances;
+		this.config = config;
     }
     
     public void setInstances( List<String> priamInstances)
@@ -29,13 +31,13 @@ public class FakeMembership implements IMembership
     @Override
     public int getRacMembershipSize()
     {
-        return 3;
+        return (instances != null?instances.size():0);
     }
 
     @Override
     public int getRacCount()
     {
-        return 3;
+		return config.getRacs().size();
     }
 
     @Override
